@@ -3,13 +3,18 @@ import pandas as pd
 df = pd.read_excel('plastic-pollution (1).xlsx')
 
 dfAmerica = df[df['Entity'] == 'Americas (excl. USA)']
-years = dfAmerica['Year']
+#years = dfAmerica['Year']
+
+
 
 print("Americas (excl. USA): ")
 years = [2010,2019]
 mismanaged_str = list(dfAmerica["Mismanaged(T)"])
 
-mismanaged = [int(value.replace(",", "")) for value in mismanaged_str]
+mismanaged_transform = [int(value.replace(",", "")) for value in mismanaged_str]
+
+mismanaged = [value for year, value in zip(years,mismanaged_transform)]
+
 for year, value in zip(years,mismanaged):
     print(f"Ano {year}: {value:,.0f} t")
 
