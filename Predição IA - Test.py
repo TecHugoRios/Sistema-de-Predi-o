@@ -1,44 +1,59 @@
 import pandas as pd
 
-df = pd.read_excel('plastic-waste-generation.xlsx')
+df = pd.read_excel('plastic-waste-generation-2000-2019.xlsx')
 
-dfAmerica = df[df['Entity'] == 'Americas (excl. USA)']
-dfUSA = df[df['Entity'] == 'United States']
-years = list(dfAmerica['Year'])
+def make_prediction(dfCont):
+    print(f"**** Continente: {dfCont.copy()['Entity'].iloc[0]} ****")
+    years = list(dfCont['Year'])
+    total_waste_str = list(dfCont["Total waste"])
 
-print(dfAmerica)
-print(dfUSA)
+    total_waste = [value for year, value in zip(years,total_waste_str)]
+    diff_from_past_year = [current - previous for previous,current in zip(total_waste[:-1],total_waste[1:])]
+    print(diff_from_past_year)
 
-print("Americas (excl. USA): ")
-#years = [2010,2019]
-total_waste_str = list(dfAmerica["Total waste"])
+    for year, value, diff in zip(years[1:],total_waste[1:], diff_from_past_year):
+            print(f"Ano {year}: {value:,.0f} t - Diferenca ao ano anterior: {diff:,.0f} t ")
 
-total_waste = [value for year, value in zip(years,total_waste_str)]
+    delta_total_waste = total_waste[-1] - total_waste[0]
+    delta_years = years[-1] - years[0]
+    a = delta_total_waste / delta_years
 
-for year, value in zip(years,total_waste):
-    print(f"Ano {year}: {value:,.0f} t")
+    b = total_waste[0] - a * years[0]
+    pred_calc = a * year + b
 
-delta_total_waste = total_waste[-1] - total_waste[0]
-delta_years = years[-1] - years[0]
-a = delta_total_waste / delta_years
+    future_years = list(range(2020, 2051))
+    predictions = [pred_calc for year in future_years]
 
-b = total_waste[0] - a * years[0]
+    for year, prediction in zip(future_years, predictions):
+        print(f"Ano {year}: Previsão de plástico = {prediction:,.0f} t")
+        #print(prediction)
 
-future_years = list(range(2020, 2050))
-predictions = [a * year + b for year in future_years]
+    
 
-for year, prediction in zip(future_years, predictions):
-    print(f"Ano {year}: Previsão de plástico = {prediction:,.0f} t")
-    #print(prediction)
 
-years_list = []
+
+dfAmericas = df[df['Entity'] == 'Americas']
+dfAsia = df[df['Entity'] == 'Asia']
+dfEurope = df[df['Entity'] == 'Europe']
+dfMiddleEast_NorthAfrica = df[df['Entity'] == 'Middle East & North Africa']
+dfOceania = df[df['Entity'] == 'Oceania']
+dfSubSaharanAfrica = df[df['Entity'] == 'Sub-Saharan Africa']
+dfWorld = df[df['Entity'] == 'World']
+
+df_list = [dfAmericas,dfAsia,dfEurope,dfMiddleEast_NorthAfrica,dfOceania,dfSubSaharanAfrica,dfWorld]
+
+for dataframe in df_list:
+    make_prediction(dataframe)
+
+
+'''  years_list = []
 total_waste_list =  []
-for index,row in dfAmerica.iterrows():
+for index,row in dfAmericas.iterrows():
     year = row['Year']
     total_waste = row['Total waste']
     years_list.append(year)
 
-'''    total_waste_list.append(total_waste)
+   total_waste_list.append(total_waste)
 
 import os
 
